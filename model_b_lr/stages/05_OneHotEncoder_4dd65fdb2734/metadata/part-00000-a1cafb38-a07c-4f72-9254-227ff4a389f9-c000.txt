@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.OneHotEncoderModel","timestamp":1764784697108,"sparkVersion":"4.0.1","uid":"OneHotEncoder_4dd65fdb2734","paramMap":{"outputCol":"DestVec","inputCol":"DestIndex"},"defaultParamMap":{"handleInvalid":"error","outputCol":"OneHotEncoder_4dd65fdb2734__output","dropLast":true}}
