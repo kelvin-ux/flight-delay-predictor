@@ -6,7 +6,6 @@
     <title>Enterprise Flight Analytics</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-
         :root {
             --primary: #0f172a;
             --accent: #3b82f6;
@@ -62,10 +61,15 @@
 
         .status-badge { font-size: 0.9rem; padding: 4px 12px; border-radius: 20px; color: white; font-weight: 500; }
 
-        /* Loader */
-        .loader { width: 18px; height: 18px; border: 2px solid #ffffff; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
+        .loader {
+            width: 18px; height: 18px;
+            border: 2px solid #ffffff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+        }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </script>
     </style>
 </head>
 <body>
@@ -95,9 +99,9 @@
                     <label>Lotnisko Wylotu</label>
                     <select id="origin" required onchange="handleAirportChange()">
                         <option value="">-- Wybierz --</option>
-                        <option value="ATL">Atlanta (ATL)</option>
                         <option value="ORD">Chicago (ORD)</option>
                         <option value="LAX">Los Angeles (LAX)</option>
+                        <option value="ATL">Atlanta (ATL)</option>
                         <option value="DFW">Dallas (DFW)</option>
                         <option value="JFK">New York JFK</option>
                         <option value="DEN">Denver (DEN)</option>
@@ -112,9 +116,9 @@
                     <label>Lotnisko Przylotu</label>
                     <select id="dest" required onchange="handleAirportChange()">
                         <option value="">-- Wybierz --</option>
-                        <option value="ATL">Atlanta (ATL)</option>
                         <option value="ORD">Chicago (ORD)</option>
                         <option value="LAX">Los Angeles (LAX)</option>
+                        <option value="ATL">Atlanta (ATL)</option>
                         <option value="DFW">Dallas (DFW)</option>
                         <option value="JFK">New York JFK</option>
                         <option value="DEN">Denver (DEN)</option>
@@ -265,7 +269,6 @@
             } else {
                 distInput.value = 1000; // Fallback
                 distInput.style.color = "var(--warning)";
-                console.warn("Trasa nieznana, użyto domyślnego dystansu");
             }
         } catch (e) {
             console.error(e);
@@ -287,21 +290,19 @@
     document.getElementById('predForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
+        const resultBox = document.getElementById('result');
 
-        const timeStr = document.getElementById('depTime').value; // "14:30"
-        if (!timeStr) {
-            alert("Wybierz godzinę wylotu!");
-            return;
-        }
+        const timeStr = document.getElementById('depTime').value;
+        if (!timeStr) { alert("Wybierz godzinę wylotu!"); return; }
 
         btn.disabled = true;
-        btn.innerHTML = '<span class="loader"></span> Przetwarzanie...';
+        btn.innerHTML = '<span class="loader"></span> W kolejce...';
+        resultBox.style.display = 'none';
 
         const [hourStr, minStr] = timeStr.split(':');
         const depHour = parseInt(hourStr);
         const depMin = parseInt(minStr);
-
-        const duration = parseInt(document.getElementById('crsElapsedTime').value);
+        const duration = parseInt(document.getElementById('crsElapsedTime').value) || 120;
         const arrivalTotalMin = (depHour * 60) + depMin + duration;
         const arrivalHour = Math.floor((arrivalTotalMin / 60) % 24);
 
@@ -310,7 +311,7 @@
             UniqueCarrier: document.getElementById('carrier').value,
             Origin: document.getElementById('origin').value,
             Dest: document.getElementById('dest').value,
-            Distance: parseInt(document.getElementById('distance').value),
+            Distance: parseInt(document.getElementById('distance').value) || 1000,
             DepHour: depHour,
             DayOfWeek: parseInt(document.getElementById('dayOfWeek').value),
             Month: parseInt(document.getElementById('month').value),
@@ -325,21 +326,54 @@
         }
 
         try {
-            const res = await fetch(`${API_URL}/predict`, {
+            const res = await fetch(`${API_URL}/predict-kafka`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(formData)
             });
             const data = await res.json();
 
-            showResult(data.predicted_delay);
+            if(data.status === 'queued') {
+                btn.innerHTML = '<span class="loader"></span> Przetwarzanie...';
+                pollResult(data.request_id);
+            } else {
+                throw new Error("Błąd kolejkowania");
+            }
+
         } catch (err) {
             alert("Błąd API: " + err.message);
-        } finally {
             btn.disabled = false;
             btn.innerText = "Oblicz Predykcję";
         }
     });
+
+    async function pollResult(reqId) {
+        const btn = document.getElementById('submitBtn');
+        let attempts = 0;
+        const maxAttempts = 30;
+
+        const interval = setInterval(async () => {
+            attempts++;
+            try {
+                const res = await fetch(`${API_URL}/result/${reqId}`);
+                const data = await res.json();
+
+                if (data.status === 'ready') {
+                    clearInterval(interval);
+                    showResult(data.data.predicted_delay);
+                    btn.disabled = false;
+                    btn.innerText = "Oblicz Predykcję";
+                }
+            } catch (e) { console.error(e); }
+
+            if (attempts >= maxAttempts) {
+                clearInterval(interval);
+                alert("Timeout: Brak odpowiedzi od Sparka.");
+                btn.disabled = false;
+                btn.innerText = "Oblicz Predykcję";
+            }
+        }, 1000); // Co 1 sekundę
+    }
 
     function showResult(delay) {
         const box = document.getElementById('result');
@@ -350,6 +384,9 @@
 
         modelName.innerText = currentModel;
         box.style.display = 'block';
+
+        box.style.opacity = '0';
+        setTimeout(() => box.style.opacity = '1', 10);
 
         const sign = delay > 0 ? "+" : "";
         val.innerText = `${sign}${delay} min`;
