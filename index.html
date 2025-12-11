@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Flight Analytics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Flight Prediction System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #0f172a;
@@ -17,49 +17,212 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --purple: #8b5cf6;
         }
 
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); display: flex; justify-content: center; padding: 40px 20px; margin: 0; min-height: 100vh; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
 
-        .dashboard { background: var(--surface); width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; }
+        .dashboard {
+            background: var(--surface);
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
 
-        .header { background: var(--primary); padding: 24px 32px; color: white; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 1.25rem; font-weight: 500; display: flex; align-items: center; gap: 10px; margin: 0; }
-        .badge { background: rgba(255,255,255,0.15); font-size: 0.7rem; padding: 4px 10px; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .header {
+            background: var(--primary);
+            padding: 24px 32px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
 
         .content { padding: 32px; }
 
         .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
-        .tab { padding: 12px 24px; cursor: pointer; color: var(--text-muted); font-weight: 500; border-bottom: 2px solid transparent; transition: 0.2s; }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
         .tab:hover { color: var(--accent); }
         .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
         .grid-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
         .full-width { grid-column: span 2; }
-        @media (max-width: 700px) { .grid-form { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
+        @media (max-width: 700px) {
+            .grid-form { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+        }
 
         .form-group { display: flex; flex-direction: column; }
-        label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        input, select { padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.95rem; transition: 0.2s; background: #fff; color: var(--text-main); }
-        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        input, select {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            background: #fff;
+            color: var(--text-main);
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
         input[readonly] { background: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
-        input[type="time"] { cursor: pointer; }
-
         option:disabled { background-color: #e2e8f0; color: #94a3b8; }
 
-        .btn-submit { background: var(--accent); color: white; border: none; padding: 16px; width: 100%; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 30px; font-size: 1rem; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-submit {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            font-size: 1rem;
+            transition: 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
         .btn-submit:hover { background: #2563eb; transform: translateY(-1px); }
         .btn-submit:disabled { opacity: 0.7; cursor: wait; transform: none; }
 
-        .result-box { margin-top: 24px; padding: 24px; border-radius: 8px; background: #f8fafc; border-left: 6px solid var(--border); display: none; animation: slideDown 0.3s ease-out; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .results-container {
+            margin-top: 30px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .result-header { font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
-        .res-value { font-size: 2rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 15px; }
-        .res-desc { color: var(--text-main); font-size: 1rem; margin-top: 8px; line-height: 1.5; opacity: 0.9; }
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 700px) {
+            .results-grid { grid-template-columns: 1fr; }
+        }
 
-        .status-badge { font-size: 0.9rem; padding: 4px 12px; border-radius: 20px; color: white; font-weight: 500; }
+        .result-card {
+            padding: 24px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+        }
+
+        .result-card.regression { border-left: 5px solid var(--accent); }
+        .result-card.classification { border-left: 5px solid var(--purple); }
+
+        .result-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .result-card-header .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .result-card.regression .icon { background: var(--accent); }
+        .result-card.classification .icon { background: var(--purple); }
+
+        .result-card-title { font-weight: 600; color: var(--text-main); }
+        .result-card-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+
+        .result-main-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .result-status-badge {
+            display: inline-block;
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .result-description {
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .prob-item { margin: 12px 0; }
+        .prob-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+        .prob-label span:first-child { color: var(--text-muted); }
+        .prob-label span:last-child { font-weight: 600; color: var(--text-main); }
+
+        .prob-bar-bg {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .prob-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        .prob-bar-fill.low { background: var(--success); }
+        .prob-bar-fill.medium { background: var(--warning); }
+        .prob-bar-fill.high { background: var(--danger); }
 
         .loader {
             width: 18px; height: 18px;
@@ -69,7 +232,29 @@
             display: inline-block;
             animation: rotation 1s linear infinite;
         }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #modelB-fields {
+            display: none;
+            background: #fff7ed;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #fed7aa;
+            margin-top: 10px;
+        }
+
+        .error-box {
+            margin-top: 20px;
+            padding: 16px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            color: var(--danger);
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -77,7 +262,9 @@
 <div class="dashboard">
     <div class="header">
         <h1>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2z"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2z"/>
+            </svg>
             Flight Prediction System
         </h1>
     </div>
@@ -90,7 +277,6 @@
 
         <form id="predForm">
             <div class="grid-form">
-
                 <div class="full-width" style="margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px;">
                     <label style="color: var(--primary);">Parametry Lotu</label>
                 </div>
@@ -153,7 +339,7 @@
 
                 <div class="form-group">
                     <label>Godzina Wylotu</label>
-                    <input type="time" id="depTime" required style="cursor: pointer;">
+                    <input type="time" id="depTime" required>
                 </div>
 
                 <div class="form-group">
@@ -192,7 +378,7 @@
                     </select>
                 </div>
 
-                <div id="modelB-fields" class="full-width grid-form" style="display: none; background: #fff7ed; padding: 20px; border-radius: 8px; border: 1px solid #fed7aa; margin-top: 10px;">
+                <div id="modelB-fields" class="full-width grid-form">
                     <div class="full-width" style="margin-bottom: 5px;">
                         <label style="color: #c2410c;">Dane Operacyjne (Live)</label>
                     </div>
@@ -208,20 +394,43 @@
             </div>
 
             <button type="submit" class="btn-submit" id="submitBtn">
-                Oblicz Predykcję
+                Analizuj Lot
             </button>
         </form>
 
-        <div id="result" class="result-box">
-            <div class="result-header">Wynik Analizy (Model <span id="resModelName">A</span>)</div>
+        <div class="error-box" id="errorBox"></div>
 
-            <div class="res-value">
-                <span id="resDelay">--</span>
-                <span id="resBadge" class="status-badge">--</span>
-            </div>
+        <div class="results-container" id="resultsContainer">
+            <div class="results-grid">
+                <div class="result-card regression">
+                    <div class="result-card-header">
+                        <div class="icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v20M2 12h20"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="result-card-title">Predykcja Opóźnienia</div>
+                            <div class="result-card-subtitle">Model Regresji (Model <span id="regModelType">A</span>)</div>
+                        </div>
+                    </div>
+                    <div id="regressionContent"></div>
+                </div>
 
-            <div class="res-desc" id="resDesc">
-                --
+                <div class="result-card classification">
+                    <div class="result-card-header">
+                        <div class="icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 20V10M12 20V4M6 20v-6"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="result-card-title">Analiza Ryzyka</div>
+                            <div class="result-card-subtitle">Model Klasyfikacji</div>
+                        </div>
+                    </div>
+                    <div id="classificationContent"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -234,7 +443,6 @@
     function handleAirportChange() {
         const originSelect = document.getElementById('origin');
         const destSelect = document.getElementById('dest');
-
         const originVal = originSelect.value;
         const destVal = destSelect.value;
 
@@ -256,7 +464,6 @@
     async function fetchDistance(origin, dest) {
         const distInput = document.getElementById('distance');
         distInput.value = "Pobieranie...";
-        distInput.style.color = "var(--text-muted)";
 
         try {
             const res = await fetch(`${API_URL}/distance?origin=${origin}&dest=${dest}`);
@@ -264,14 +471,11 @@
 
             if (data.found) {
                 distInput.value = parseInt(data.distance);
-                distInput.style.color = "var(--text-main)";
                 distInput.style.fontWeight = "600";
             } else {
-                distInput.value = 1000; // Fallback
-                distInput.style.color = "var(--warning)";
+                distInput.value = 1000;
             }
         } catch (e) {
-            console.error(e);
             distInput.value = 1000;
         }
     }
@@ -281,29 +485,33 @@
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById(`tab${mode}`).classList.add('active');
 
-        const bFields = document.getElementById('modelB-fields');
-        bFields.style.display = (mode === 'B') ? 'grid' : 'none';
-
-        document.getElementById('result').style.display = 'none';
+        document.getElementById('modelB-fields').style.display = (mode === 'B') ? 'grid' : 'none';
+        document.getElementById('resultsContainer').style.display = 'none';
+        document.getElementById('errorBox').style.display = 'none';
     }
 
     document.getElementById('predForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+
         const btn = document.getElementById('submitBtn');
-        const resultBox = document.getElementById('result');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const errorBox = document.getElementById('errorBox');
 
         const timeStr = document.getElementById('depTime').value;
-        if (!timeStr) { alert("Wybierz godzinę wylotu!"); return; }
+        if (!timeStr) {
+            alert("Wybierz godzinę wylotu!");
+            return;
+        }
 
         btn.disabled = true;
-        btn.innerHTML = '<span class="loader"></span> W kolejce...';
-        resultBox.style.display = 'none';
+        btn.innerHTML = '<span class="loader"></span> Przetwarzanie...';
+        resultsContainer.style.display = 'none';
+        errorBox.style.display = 'none';
 
         const [hourStr, minStr] = timeStr.split(':');
         const depHour = parseInt(hourStr);
-        const depMin = parseInt(minStr);
         const duration = parseInt(document.getElementById('crsElapsedTime').value) || 120;
-        const arrivalTotalMin = (depHour * 60) + depMin + duration;
+        const arrivalTotalMin = (depHour * 60) + parseInt(minStr) + duration;
         const arrivalHour = Math.floor((arrivalTotalMin / 60) % 24);
 
         const formData = {
@@ -326,90 +534,102 @@
         }
 
         try {
-            const res = await fetch(`${API_URL}/predict-kafka`, {
+            const res = await fetch(`${API_URL}/predict`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(formData)
             });
+
             const data = await res.json();
 
-            if(data.status === 'queued') {
-                btn.innerHTML = '<span class="loader"></span> Przetwarzanie...';
-                pollResult(data.request_id);
+            if (data.status === 'success') {
+                document.getElementById('regModelType').innerText = currentModel;
+                renderRegressionResult(data.regression);
+                renderClassificationResult(data.classification);
+                resultsContainer.style.display = 'block';
+            } else if (data.status === 'partial') {
+                if (data.regression) renderRegressionResult(data.regression);
+                if (data.classification) renderClassificationResult(data.classification);
+                resultsContainer.style.display = 'block';
             } else {
-                throw new Error("Błąd kolejkowania");
+                errorBox.innerText = data.error || 'Timeout - brak odpowiedzi od modeli';
+                errorBox.style.display = 'block';
             }
 
         } catch (err) {
-            alert("Błąd API: " + err.message);
-            btn.disabled = false;
-            btn.innerText = "Oblicz Predykcję";
+            errorBox.innerText = 'Błąd połączenia: ' + err.message;
+            errorBox.style.display = 'block';
         }
+
+        btn.disabled = false;
+        btn.innerHTML = 'Analizuj Lot';
     });
 
-    async function pollResult(reqId) {
-        const btn = document.getElementById('submitBtn');
-        let attempts = 0;
-        const maxAttempts = 30;
+    function renderRegressionResult(data) {
+        const container = document.getElementById('regressionContent');
+        const delay = data.predicted_delay_minutes;
 
-        const interval = setInterval(async () => {
-            attempts++;
-            try {
-                const res = await fetch(`${API_URL}/result/${reqId}`);
-                const data = await res.json();
-
-                if (data.status === 'ready') {
-                    clearInterval(interval);
-                    showResult(data.data.predicted_delay);
-                    btn.disabled = false;
-                    btn.innerText = "Oblicz Predykcję";
-                }
-            } catch (e) { console.error(e); }
-
-            if (attempts >= maxAttempts) {
-                clearInterval(interval);
-                alert("Timeout: Brak odpowiedzi od Sparka.");
-                btn.disabled = false;
-                btn.innerText = "Oblicz Predykcję";
-            }
-        }, 1000); // Co 1 sekundę
-    }
-
-    function showResult(delay) {
-        const box = document.getElementById('result');
-        const val = document.getElementById('resDelay');
-        const badge = document.getElementById('resBadge');
-        const desc = document.getElementById('resDesc');
-        const modelName = document.getElementById('resModelName');
-
-        modelName.innerText = currentModel;
-        box.style.display = 'block';
-
-        box.style.opacity = '0';
-        setTimeout(() => box.style.opacity = '1', 10);
-
-        const sign = delay > 0 ? "+" : "";
-        val.innerText = `${sign}${delay} min`;
+        let statusColor, statusText, description;
 
         if (delay <= 15) {
-            box.style.borderLeftColor = "var(--success)";
-            val.style.color = "var(--success)";
-            badge.style.backgroundColor = "var(--success)";
-            badge.innerText = "PUNKTUALNY";
-            desc.innerText = "Lot powinien odbyć się zgodnie z planem. Ryzyko opóźnienia jest minimalne.";
+            statusColor = 'var(--success)';
+            statusText = 'PUNKTUALNY';
+            description = 'Lot powinien odbyć się zgodnie z planem.';
         } else if (delay <= 45) {
-            box.style.borderLeftColor = "var(--warning)";
-            val.style.color = "var(--warning)";
-            badge.style.backgroundColor = "var(--warning)";
-            badge.innerText = "OPÓŹNIONY";
-            desc.innerText = "Spodziewane umiarkowane opóźnienie. Zalecamy monitorowanie statusu.";
+            statusColor = 'var(--warning)';
+            statusText = 'OPÓŹNIONY';
+            description = 'Spodziewane umiarkowane opóźnienie.';
         } else {
-            box.style.borderLeftColor = "var(--danger)";
-            val.style.color = "var(--danger)";
-            badge.style.backgroundColor = "var(--danger)";
-            badge.innerText = "KRYTYCZNY";
-            desc.innerText = "Wysokie ryzyko znacznego opóźnienia! Możliwa utrata połączeń przesiadkowych.";
+            statusColor = 'var(--danger)';
+            statusText = 'KRYTYCZNY';
+            description = 'Wysokie ryzyko znacznego opóźnienia!';
         }
+
+        const sign = delay > 0 ? "+" : "";
+
+        container.innerHTML = `
+            <div class="result-main-value" style="color: ${statusColor}">
+                ${sign}${delay} min
+            </div>
+            <span class="result-status-badge" style="background: ${statusColor}">
+                ${statusText}
+            </span>
+            <div class="result-description">${description}</div>
+        `;
+    }
+
+    function renderClassificationResult(data) {
+        const container = document.getElementById('classificationContent');
+        const prob30 = data.probability_over_30min;
+        const prob60 = data.probability_over_60min;
+
+        function getBarClass(prob) {
+            if (prob < 25) return 'low';
+            if (prob < 50) return 'medium';
+            return 'high';
+        }
+
+        container.innerHTML = `
+            <div class="prob-item">
+                <div class="prob-label">
+                    <span>Opóźnienie > 30 min</span>
+                    <span>${prob30.toFixed(1)}%</span>
+                </div>
+                <div class="prob-bar-bg">
+                    <div class="prob-bar-fill ${getBarClass(prob30)}" style="width: ${prob30}%"></div>
+                </div>
+            </div>
+
+            <div class="prob-item">
+                <div class="prob-label">
+                    <span>Opóźnienie > 60 min</span>
+                    <span>${prob60.toFixed(1)}%</span>
+                </div>
+                <div class="prob-bar-bg">
+                    <div class="prob-bar-fill ${getBarClass(prob60)}" style="width: ${prob60}%"></div>
+                </div>
+            </div>
+        `;
     }
 </script>
 
